@@ -7,6 +7,7 @@ const { GraphQL } = require('./src/graphql')
 const { Redis } = require('./src/datastore/redis')
 const { Fake } = require('./src/datastore/fake')
 
+
 // Parse CLI flags
 program
   .version('0.1.0')
@@ -34,7 +35,7 @@ switch (program.store) {
     client.on("error", err => logger.error(err))
     store = new Redis(client)
     break
-    case 'fake':
+  case 'fake':
     logger.info('using fake datastore')
     store = new Fake()
     break

@@ -33,27 +33,27 @@ type Mutation {
 }
 `
 
-const resolvers = (logger, store) => ({
+const resolvers = logger => ({
   Query: {
-    checkinsByEvent: event => {
+    checkinsByEvent: (event) => {
       logger.info(`getting checkins for event: ${event}`)
       return [{
-        id: "TODO",
-        name: "Test Checkin"
+        id: 'TODO',
+        name: 'Test Checkin'
       }]
     },
     events: () => {
       return [{
-        id: "TODO",
-        name: "Test Event"
+        id: 'TODO',
+        name: 'Test Event'
       }]
     }
   },
   Mutation: {
-    createEvent: event => {
+    createEvent: () => {
       // TODO
     },
-    createCheckin: checkin => {
+    createCheckin: () => {
       // TODO
     }
   }
