@@ -46,7 +46,9 @@ const testDatastore = (name, constructor) =>
 
       it('should support key prefix range queries', async () => {
         let results = await store.range('foo')
-        expect(results.toJS()).to.deep.equal([ fooVal.toJS(), foobarVal.toJS() ])
+        expect(results.toJS()).to.have.length(2)
+        expect(results.toJS()).to.deep.contain(fooVal.toJS())
+        expect(results.toJS()).to.deep.contain(foobarVal.toJS())
       })
   })
 })
