@@ -47,6 +47,7 @@ switch (program.store) {
 const app = express()
 app.use(expressWinston.logger(loggerOpts))
 app.use(expressWinston.errorLogger(loggerOpts))
+app.get('/events/:eventUID/checkins', ListCheckinsByEvent(store))
 
 app.get('/healthz', (req, res) => {
   res.send('ok')
