@@ -56,5 +56,5 @@ testDatastore('fake', () => new Fake())
 if (process.env.REDIS_INTEGRATION) {
   let client = redis.createClient()
   let test = testDatastore('redis', () => new Redis(client))
-  test.afterAll = () => client.quit()
+  test.afterAll(() => client.quit())
 }
