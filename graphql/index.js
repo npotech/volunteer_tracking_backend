@@ -48,6 +48,14 @@ const resolvers = (logger, redis) => ({
         name: "Test Event"
       }]
     }
+  },
+  Mutation: {
+    createEvent: event => {
+      // TODO
+    },
+    createCheckin: checkin => {
+      // TODO
+    }
   }
 })
 
