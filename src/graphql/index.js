@@ -33,7 +33,7 @@ type Mutation {
 }
 `
 
-const resolvers = (logger, redis) => ({
+const resolvers = (logger, store) => ({
   Query: {
     checkinsByEvent: event => {
       logger.info(`getting checkins for event: ${event}`)
