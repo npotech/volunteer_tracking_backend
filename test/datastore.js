@@ -14,7 +14,7 @@ const testDatastore = (name, constructor) =>
       return store.get(key)
         .then(val => {
           // Prove an unset key returns undefined
-          expect(val).to.be.null
+          expect(val).to.be.undefined
         })
         .then(() => store.set(key, val))
         .then(val => {
@@ -25,7 +25,7 @@ const testDatastore = (name, constructor) =>
         .then(() => store.get(key))
         .then(val => {
           // Prove deleting a key actually deletes it
-          expect(val).to.be.null
+          expect(val).to.be.undefined
         })
     })
 
@@ -50,7 +50,7 @@ const testDatastore = (name, constructor) =>
     })
   })
 
-// testDatastore('fake', () => new Fake())
+testDatastore('fake', () => new Fake())
 
 if (process.env.REDIS_INTEGRATION) {
   let client = redis.createClient()
