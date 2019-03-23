@@ -5,7 +5,7 @@ const stringifyPromise = promisify(stringify)
 
 const ListCheckinsByEvent = store => async (req, res) => {
   let event = req.params.eventUID
-  let checkins = await store.range(`e/${event}`)
+  let checkins = await store.range(`ev/${event}`)
 
   // TODO(jordan): Authorization logic
 

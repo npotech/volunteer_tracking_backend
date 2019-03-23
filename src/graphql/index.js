@@ -1,4 +1,7 @@
 const { ApolloServer, gql } = require('apollo-server-express')
+const { Map } = require('immutable')
+const GraphQLDateTime = require('graphql-type-datetime')
+const GraphQLJSON = require('graphql-type-json')
 
 
 const typeDefs = gql`
@@ -7,10 +10,9 @@ const typeDefs = gql`
   scalar JSON
 
   type VolunteerSession {
-    id: ID!
     event: ID!
-    name: String
     email: String!
+    name: String
     attributes: JSON
     timestamp_in: DateTime
     timestamp_out: DateTime
@@ -56,7 +58,7 @@ const typeDefs = gql`
   }
 `
 
-const resolvers = logger => ({
+const resolvers = (logger, redis) => ({
   Query: {
     checkinsByEvent: (event) => {
       logger.info(`getting checkins for event: ${event}`)
@@ -73,13 +75,38 @@ const resolvers = logger => ({
     }
   },
   Mutation: {
-    createEvent: () => {
-      // TODO
+    createEvent: (_parent, {event: event_arg}, _context) => {
+      const id = event_arg.id
+      const event = Map(event_arg)
+      redis.set(`ev/${id}`, event)
+      return true
     },
-    createCheckin: () => {
-      // TODO
+    createCheckin: (_parent, {checkin: checkin_arg}, _context) => {
+      const {
+        event: event_id,
+        email,
+        timestamp
+      } = checkin_arg
+      const checkin = Map(checkin_arg)
+
+      redis.set(`ec/${event_id}/c/${email}/in/${timestamp}`, checkin)
+      return true
+    },
+    createCheckout: (_parent, {checkout: checkout_arg}, _context) => {
+      const {
+        event: event_id,
+        email,
+        timestamp
+      } = checkout_arg
+      const checkout = Map(checkout_arg)
+
+      redis.set(`ec/${event_id}/c/${email}/out/${timestamp}`, checkout)
+      return true
     }
-  }
+  },
+  // custom types
+  DateTime: GraphQLDateTime,
+  JSON: GraphQLJSON,
 })
 
 const GraphQL = (app, logger, redis) => {

@@ -26,6 +26,8 @@
     "express": "^4.16.4",
     "express-winston": "^3.1.0",
     "graphql": "^14.1.1",
+    "graphql-type-datetime": "^0.2.2",
+    "graphql-type-json": "^0.2.2",
     "immutable": "^4.0.0-rc.12",
     "redis": "^2.8.0",
     "winston": "^3.2.1"
