@@ -4,11 +4,15 @@ const { ApolloServer, gql } = require('apollo-server-express')
 const typeDefs = gql`
 type Checkin {
   id: String!
+  # TODO change String to a type-aliased ID
+  event: String!
   name: String
 }
 
 input CheckinInput {
   id: String!
+  # TODO change String to a type-aliased ID
+  event: String!
   name: String
 }
 
