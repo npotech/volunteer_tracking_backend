@@ -2,39 +2,58 @@ const { ApolloServer, gql } = require('apollo-server-express')
 
 
 const typeDefs = gql`
-type Checkin {
-  id: String!
-  # TODO change String to a type-aliased ID
-  event: String!
-  name: String
-}
+  union ID = String
+  scalar DateTime
+  scalar JSON
 
-input CheckinInput {
-  id: String!
-  # TODO change String to a type-aliased ID
-  event: String!
-  name: String
-}
+  type VolunteerSession {
+    id: ID!
+    event: ID!
+    name: String
+    email: String!
+    attributes: JSON
+    timestamp_in: DateTime
+    timestamp_out: DateTime
+  }
 
-type Event {
-  id: String!
-  name: String
-}
+  input CheckinInput {
+    event: ID!
+    name: String!
+    email: String!
+    attributes: JSON
+    timestamp: DateTime!
+  }
 
-input EventInput {
-  id: String!
-  name: String
-}
+  input CheckoutInput {
+    event: ID!
+    email: String!
+    attributes: JSON
+    timestamp: DateTime!
+  }
+  
+  type Event {
+    id: ID!
+    name: String!
+    date: DateTime!
+    voulnteer_sessions: [VolunteerSession!]!
+  }
 
-type Query {
-  checkinsByEvent(event: String!): [Checkin]
-  events: [Event]
-}
+  input EventInput {
+    id: ID!
+    name: String!
+    date: DateTime!
+  }
 
-type Mutation {
-  createEvent(event: EventInput!): Boolean
-  createCheckin(checkin: CheckinInput!): Boolean
-}
+  type Query {
+    checkinsByEvent(event: String!): [VolunteerSession!]!
+    events: [Event!]
+  }
+
+  type Mutation {
+    createEvent(event: EventInput!): Boolean
+    createCheckin(checkin: CheckinInput!): Boolean
+    createCheckout(checkout: CheckoutInput!): Boolean
+  }
 `
 
 const resolvers = logger => ({
