@@ -22,6 +22,7 @@
     "apollo-server": "^2.4.8",
     "apollo-server-express": "^2.4.8",
     "commander": "^2.19.0",
+    "csv": "^5.1.1",
     "express": "^4.16.4",
     "express-winston": "^3.1.0",
     "graphql": "^14.1.1",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.15.3",
-    "mocha": "^6.0.2"
+    "mocha": "^6.0.2",
+    "supertest": "^4.0.2"
   }
 }
