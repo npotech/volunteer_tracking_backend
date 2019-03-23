@@ -1,0 +1,30 @@
+{
+  "name": "volunteer_tracking_backend",
+  "version": "0.1.0",
+  "description": "Backend for volunteer tracking mobile app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npotech/volunteer_tracking_backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/npotech/volunteer_tracking_backend/issues"
+  },
+  "homepage": "https://github.com/npotech/volunteer_tracking_backend#readme",
+  "dependencies": {
+    "apollo-server": "^2.4.8",
+    "apollo-server-express": "^2.4.8",
+    "express": "^4.16.4",
+    "express-winston": "^3.1.0",
+    "graphql": "^14.1.1",
+    "immutable": "^4.0.0-rc.12",
+    "redis": "^2.8.0",
+    "winston": "^3.2.1"
+  }
+}
