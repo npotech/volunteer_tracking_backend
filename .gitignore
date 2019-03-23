@@ -65,3 +65,6 @@ typings/
 
 # Vim
 **/*.sw[po]
+
+# macOS
+.DS_Store
