@@ -16,16 +16,16 @@ const testDatastore = (name, constructor) =>
       expect(actual).to.be.null
 
       // Prove keys can be set and retrieved
-      store.set(key, val)
+      await store.set(key, val)
       actual = await store.get(key)
       expect(actual).to.deep.equal(val)
 
-      store.delete(key)
+      await store.delete(key)
       actual = await store.get(key)
       expect(actual).to.be.null
     })
 
-    context('given three keys', async () => {
+    context('given three keys', () => {
       let store
       let fooVal = new Map({ 'fooval': true })
       let foobarVal = new Map({ 'foobarval': true })
