@@ -31,21 +31,22 @@ const testDatastore = (name, constructor) =>
 
     it('should support key prefix range queries', () => {
       let store = constructor()
-      let fooValue = new Map({ 'fooValue': true })
-      let fooBarValue = new Map({ 'foobarValue': true })
-      let bazBarValue = new Map({ 'bazbarValue': true })
+      let val = new Map({ 'value': true })
 
-      return store.set('foo', fooValue)
-        .then(() => store.set('foobar', fooBarValue))
-        .then(() => store.set('bazbar', bazBarValue))
+      return store.set('foo', val)
+        .then(() => store.set('foobar', val))
+        .then(() => store.set('bazbar', val))
         .then(() => store.range('foo'))
         .then(vals => {
           // It doesn't return the value of bazbar because
           // it doesn't share the "foo" prefix
-          expect(vals).to.deep.equal(
-            new List([fooValue, fooBarValue])
-          )
+          expect(vals).to.contain('foo')
+          expect(vals).to.contain('foobar')
+          expect(vals).to.have.length(2)
         })
+        .then(() => store.delete('foo'))
+        .then(() => store.delete('foobar'))
+        .then(() => store.delete('bazbar'))
     })
   })
 

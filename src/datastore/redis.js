@@ -23,6 +23,6 @@ exports.Redis = class Redis {
   }
 
   range(prefix) {
-    return this._scan(prefix)
+    return this._scan("0", "match", `${prefix}*`).then(val => val[1])
   }
 }
