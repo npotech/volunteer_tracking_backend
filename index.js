@@ -2,7 +2,7 @@ const redis = require('redis')
 const winston = require('winston')
 const expressWinston = require('express-winston')
 const express = require('express')
-const { GraphQL } = require('./graphql')
+const { GraphQL } = require('./src/graphql')
 
 
 const loggerOpts = {

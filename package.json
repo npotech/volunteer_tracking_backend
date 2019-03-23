@@ -4,7 +4,7 @@
   "description": "Backend for volunteer tracking mobile app",
   "main": "index.js",
   "scripts": {
-    "test": "echo TODO",
+    "test": "mocha --recursive",
     "start": "node index.js"
   },
   "repository": {
@@ -28,6 +28,7 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "mocha": "^6.0.2"
   }
 }
