@@ -1,4 +1,4 @@
-const { Map, List } = require('immutable')
+const { Map, fromJS } = require('immutable')
 const { expect } = require('chai')
 const { Fake } = require('../src/datastore/fake')
 const { Redis } = require('../src/datastore/redis')
@@ -6,49 +6,50 @@ const redis = require('redis')
 
 const testDatastore = (name, constructor) =>
   describe(`${name} datastore`, () => {
-    it('should support getting, setting, and deleting keys', () => {
+    it('should support getting, setting, and deleting keys', async () => {
       let store = constructor()
       let key = 'foo'
       let val = new Map({ bar: 'baz' })
 
-      return store.get(key)
-        .then(val => {
-          // Prove an unset key returns undefined
-          expect(val).to.be.undefined
-        })
-        .then(() => store.set(key, val))
-        .then(val => {
-          // Prove keys can be set and retrieved
-          expect(val).to.deep.equal(val)
-        })
-        .then(() => store.delete(key))
-        .then(() => store.get(key))
-        .then(val => {
-          // Prove deleting a key actually deletes it
-          expect(val).to.be.undefined
-        })
+      // Prove an unset key returns null
+      let actual = await store.get(key)
+      expect(actual).to.be.null
+
+      // Prove keys can be set and retrieved
+      await store.set(key, val)
+      actual = await store.get(key)
+      expect(actual).to.deep.equal(val)
+
+      await store.delete(key)
+      actual = await store.get(key)
+      expect(actual).to.be.null
     })
 
-    it('should support key prefix range queries', () => {
-      let store = constructor()
-      let val = new Map({ 'value': true })
+    context('given three keys', () => {
+      let store
+      let fooVal = new Map({ 'fooval': true })
+      let foobarVal = new Map({ 'foobarval': true })
+      let bazbarVal = new Map({ 'bazbarval': true })
 
-      return store.set('foo', val)
-        .then(() => store.set('foobar', val))
-        .then(() => store.set('bazbar', val))
-        .then(() => store.range('foo'))
-        .then(vals => {
-          // It doesn't return the value of bazbar because
-          // it doesn't share the "foo" prefix
-          expect(vals).to.contain('foo')
-          expect(vals).to.contain('foobar')
-          expect(vals).to.have.length(2)
-        })
-        .then(() => store.delete('foo'))
-        .then(() => store.delete('foobar'))
-        .then(() => store.delete('bazbar'))
-    })
+      beforeEach(async () => {
+        store = constructor()
+        await store.set('foo', fooVal)
+        await store.set('foobar', foobarVal)
+        await store.set('bazbar', bazbarVal)
+      })
+
+      afterEach(async () => {
+        await store.delete('foo')
+        await store.delete('foobar')
+        await store.delete('bazbar')
+      })
+
+      it('should support key prefix range queries', async () => {
+        let results = await store.range('foo')
+        expect(results.toJS()).to.deep.equal([ fooVal.toJS(), foobarVal.toJS() ])
+      })
   })
+})
 
 testDatastore('fake', () => new Fake())
 
