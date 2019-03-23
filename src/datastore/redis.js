@@ -10,19 +10,24 @@ exports.Redis = class Redis {
     this._scan = promisify(client.scan).bind(client)
   }
 
-  get(key) {
-    return this._get(key).then(raw => fromJS(JSON.parse(raw)))
+  async get(key) { 
+    return this._get(key)
+      .then(raw => fromJS(JSON.parse(raw)))
   }
 
-  set(key, value) {
+  async set(key, value) {
     return this._set(key, JSON.stringify(value.toJS()))
   }
   
-  delete(key) {
+  async delete(key) {
     return this._del(key)
   }
 
-  range(prefix) {
-    return this._scan("0", "match", `${prefix}*`).then(val => val[1])
+  async range(prefix) {
+    return this._scan("0", "match", `${prefix}*`)
+      .then(result => Promise.all(
+        result[1].map(key => this.get(key))
+      ))
+      .then(array => fromJS(array))
   }
 }
