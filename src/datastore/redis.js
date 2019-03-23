@@ -24,7 +24,7 @@ exports.Redis = class Redis {
   }
 
   async range(prefix) {
-    return this._scan("0", "match", `${prefix}*`)
+    return this._scan('0', 'match', `${prefix}*`)
       .then(result => Promise.all(
         result[1].map(key => this.get(key))
       ))
