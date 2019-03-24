@@ -20,8 +20,8 @@ describe('the listCheckinsByEvent request handler', () => {
 
   context('given two checkins', () => {
     beforeEach(async () => {
-      await store.set(`e/${eventUID}/foo`, fromJS({ foo: 'bar' }))
-      await store.set(`e/${eventUID}/bar`, fromJS({ baz: 'another' }))
+      await store.set(`ev/${eventUID}/foo`, fromJS({ foo: 'bar' }))
+      await store.set(`ev/${eventUID}/bar`, fromJS({ baz: 'another' }))
     })
 
     it('should return the checkins as csv', () => {   
