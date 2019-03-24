@@ -75,13 +75,13 @@ const resolvers = (logger, redis) => ({
     }
   },
   Mutation: {
-    createEvent: (_parent, {event: event_arg}, _context) => {
+    createEvent: (_, {event: event_arg}) => {
       const id = event_arg.id
       const event = Map(event_arg)
       redis.set(`ev/${id}`, event)
       return true
     },
-    createCheckin: (_parent, {checkin: checkin_arg}, _context) => {
+    createCheckin: (_, {checkin: checkin_arg}) => {
       const {
         event: event_id,
         email,
@@ -92,7 +92,7 @@ const resolvers = (logger, redis) => ({
       redis.set(`ec/${event_id}/c/${email}/in/${timestamp}`, checkin)
       return true
     },
-    createCheckout: (_parent, {checkout: checkout_arg}, _context) => {
+    createCheckout: (_, {checkout: checkout_arg}) => {
       const {
         event: event_id,
         email,
