@@ -2,7 +2,7 @@ const { ApolloServer, gql } = require('apollo-server-express')
 const { Map } = require('immutable')
 const GraphQLDateTime = require('graphql-type-datetime')
 const GraphQLJSON = require('graphql-type-json')
-const {inspect} = require('util')
+// const {inspect} = require('util')
 
 
 const typeDefs = gql`
@@ -69,7 +69,7 @@ const resolvers = (logger, store) => ({
       }]
     },
     events: async () => {
-      x = (await store.range('ev/')).toJS().map(event => ({
+      let x = (await store.range('ev/')).toJS().map(event => ({
         ...event,
         // TODO implement getting volunteer sessions
         volunteer_sessions: []
