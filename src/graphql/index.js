@@ -69,7 +69,7 @@ const resolvers = (logger, store) => ({
       }]
     },
     events: async () => {
-      let x = (await store.range('ev/')).toJS().map(event => ({
+      let x = (await store.range('event/')).toJS().map(event => ({
         ...event,
         // TODO implement getting volunteer sessions
         volunteer_sessions: []
@@ -81,7 +81,7 @@ const resolvers = (logger, store) => ({
     createEvent: (_, {event: event_arg}) => {
       const id = event_arg.id
       const event = Map(event_arg)
-      store.set(`ev/${id}`, event)
+      store.set(`event/${id}`, event)
       return true
     },
     createCheckin: (_, {checkin: checkin_arg}) => {
@@ -92,7 +92,7 @@ const resolvers = (logger, store) => ({
       } = checkin_arg
       const checkin = Map(checkin_arg)
 
-      store.set(`ec/${event_id}/c/${email}/in/${timestamp}`, checkin)
+      store.set(`event-check-in/${event_id}/check-in/${email}/in/${timestamp}`, checkin)
       return true
     },
     createCheckout: (_, {checkout: checkout_arg}) => {
@@ -103,7 +103,7 @@ const resolvers = (logger, store) => ({
       } = checkout_arg
       const checkout = Map(checkout_arg)
 
-      store.set(`ec/${event_id}/c/${email}/out/${timestamp}`, checkout)
+      store.set(`event-check-in/${event_id}/check-in/${email}/out/${timestamp}`, checkout)
       return true
     }
   },

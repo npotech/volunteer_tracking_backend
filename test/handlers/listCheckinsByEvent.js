@@ -10,7 +10,7 @@ describe('the listCheckinsByEvent request handler', () => {
   beforeEach(done => {
     let app = express()
     store = new Fake()
-    app.get('/events/:eventUID/checkins', ListCheckinsByEvent(store))
+    app.get('/events/:eventUID/check-ins', ListCheckinsByEvent(store))
     server = app.listen(0, done)
   })
 
@@ -20,13 +20,13 @@ describe('the listCheckinsByEvent request handler', () => {
 
   context('given two checkins', () => {
     beforeEach(async () => {
-      await store.set(`ev/${eventUID}/foo`, fromJS({ foo: 'bar' }))
-      await store.set(`ev/${eventUID}/bar`, fromJS({ baz: 'another' }))
+      await store.set(`event/${eventUID}/foo`, fromJS({ foo: 'bar' }))
+      await store.set(`event/${eventUID}/bar`, fromJS({ baz: 'another' }))
     })
 
     it('should return the checkins as csv', () => {   
       return request(server)
-        .get(`/events/${eventUID}/checkins`)
+        .get(`/events/${eventUID}/check-ins`)
         .expect('Content-Type', 'text/csv; charset=utf-8')
         .expect(200, 'bar\n\n')
     })
@@ -35,7 +35,7 @@ describe('the listCheckinsByEvent request handler', () => {
   context('given no checkins', () => {
     it('should return an empty string', () => {
       return request(server)
-        .get(`/events/${eventUID}/checkins`)
+        .get(`/events/${eventUID}/check-ins`)
         .expect('Content-Type', 'text/csv; charset=utf-8')
         .expect(200, '')
     })
