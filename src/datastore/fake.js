@@ -11,6 +11,11 @@ exports.Fake = class Fake {
     return value === undefined ? null : value
   }
   async set(key, value) { this._map = this._map.set(key, value) }
+  async setIfNotExists(key, value) {
+    if (!this._map.has(key)) {
+      this._map = this._map.set(key, value)
+    }
+  }
   async delete(key) { this._map = this._map.delete(key) }
   async range(prefix) { return this._map.filter((_, k) => k.startsWith(prefix)).toList() }
 }

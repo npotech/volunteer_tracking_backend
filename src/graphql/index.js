@@ -15,8 +15,8 @@ const typeDefs = gql`
     email: String!
     name: String
     attributes: JSON
-    timestamp_in: DateTime
-    timestamp_out: DateTime
+    timestampsIn: [DateTime]!
+    timestampsOut: [DateTime]!
   }
 
   input CheckinInput {
@@ -36,9 +36,9 @@ const typeDefs = gql`
   
   type Event {
     id: ID!
-    name: String!
-    date: DateTime!
-    volunteer_sessions: [VolunteerSession!]!
+    name: String
+    date: DateTime
+    volunteerSessions: [VolunteerSession!]!
   }
 
   input EventInput {
@@ -49,7 +49,8 @@ const typeDefs = gql`
 
   type Query {
     checkinsByEvent(event: String!): [VolunteerSession!]!
-    events: [Event!]
+    events(onlyKnown: Boolean = true): [Event!]
+    isUserKnown(email: String!): Boolean!
   }
 
   type Mutation {
@@ -59,51 +60,92 @@ const typeDefs = gql`
   }
 `
 
+async function checkinsByEvent(logger, store, eventId) {
+  logger.info(`getting checkins for event: ${eventId}`)
+  let checkins = (await store.range(`event-check-in/${eventId}/check-in/`))
+    .toJS()
+    .reduce((checkins, checkin) => {
+      const email = checkin.email
+      let existingCheckin
+
+      if (checkins.has(email)) {
+        existingCheckin = checkins.get(email)
+      } else {
+        existingCheckin = {
+          event: checkin.event,
+          name: checkin.name,
+          email: checkin.email,
+          attributes: checkin.attributes,
+          timestampsIn: [],
+          timestampsOut: [],
+        }
+      }
+
+      if (checkin.checkinType == 'in') {
+        existingCheckin.timestampsIn.push(checkin.timestamp)
+      } else if (checkin.checkinType == 'out') {
+        existingCheckin.timestampsOut.push(checkin.timestamp)
+      }
+
+      return checkins.set(email, existingCheckin)
+    }, Map())
+    .valueSeq()
+    .toJS()
+  return checkins || []
+}
+
 const resolvers = (logger, store) => ({
   Query: {
-    checkinsByEvent: (event) => {
-      logger.info(`getting checkins for event: ${event}`)
-      return [{
-        id: 'TODO',
-        name: 'Test Checkin'
-      }]
+    checkinsByEvent: async (_, {event}) => {
+      logger.info('Event:', event)
+      return await checkinsByEvent(logger, store, event)
     },
-    events: async () => {
-      let x = (await store.range('event/')).toJS().map(event => ({
-        ...event,
-        // TODO implement getting volunteer sessions
-        volunteer_sessions: []
-      }))
-      return x
+    events: async (_, {onlyKnown}) => {
+      let events = (await store.range('event/'))
+        .toJS()
+        .filter(event => !onlyKnown || (!!event.name && !!event.date))
+        .map(async (event) => ({
+          ...event,
+          volunteerSessions: (await checkinsByEvent(logger, store, event.id))
+        }))
+      return events
+    },
+    isUserKnown: async (_, {email}) => {
+      return null !== await store.get(`user/${email}`)
     }
   },
   Mutation: {
-    createEvent: (_, {event: event_arg}) => {
-      const id = event_arg.id
-      const event = Map(event_arg)
+    createEvent: (_, {event: eventArg}) => {
+      const id = eventArg.id
+      const event = Map(eventArg)
       store.set(`event/${id}`, event)
       return true
     },
-    createCheckin: (_, {checkin: checkin_arg}) => {
+    createCheckin: (_, {checkin: checkinArg}) => {
       const {
-        event: event_id,
+        event: eventId,
         email,
-        timestamp
-      } = checkin_arg
-      const checkin = Map(checkin_arg)
+        timestamp,
+      } = checkinArg
+      checkinArg.checkinType = 'in'
+      const checkin = Map(checkinArg)
 
-      store.set(`event-check-in/${event_id}/check-in/${email}/in/${timestamp}`, checkin)
+      store.setIfNotExists(`user/${email}`, Map())
+      store.set(`event-check-in/${eventId}/check-in/${email}/in/${timestamp}`, checkin)
+      store.setIfNotExists(`event/${eventId}`, Map({id: eventId}))
       return true
     },
-    createCheckout: (_, {checkout: checkout_arg}) => {
+    createCheckout: (_, {checkout: checkoutArg}) => {
       const {
-        event: event_id,
+        event: eventId,
         email,
         timestamp
-      } = checkout_arg
-      const checkout = Map(checkout_arg)
+      } = checkoutArg
+      checkoutArg.checkinType = 'out'
+      const checkout = Map(checkoutArg)
 
-      store.set(`event-check-in/${event_id}/check-in/${email}/out/${timestamp}`, checkout)
+      store.setIfNotExists(`user/${email}`, Map())
+      store.set(`event-check-in/${eventId}/check-in/${email}/out/${timestamp}`, checkout)
       return true
     }
   },
