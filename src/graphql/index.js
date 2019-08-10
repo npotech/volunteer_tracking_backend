@@ -2,6 +2,7 @@ const { ApolloServer, gql } = require('apollo-server-express')
 const { Map } = require('immutable')
 const GraphQLDateTime = require('graphql-type-datetime')
 const GraphQLJSON = require('graphql-type-json')
+const {inspect} = require('util')
 
 
 const typeDefs = gql`
@@ -37,7 +38,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     date: DateTime!
-    voulnteer_sessions: [VolunteerSession!]!
+    volunteer_sessions: [VolunteerSession!]!
   }
 
   input EventInput {
@@ -58,7 +59,7 @@ const typeDefs = gql`
   }
 `
 
-const resolvers = (logger, redis) => ({
+const resolvers = (logger, store) => ({
   Query: {
     checkinsByEvent: (event) => {
       logger.info(`getting checkins for event: ${event}`)
@@ -67,18 +68,20 @@ const resolvers = (logger, redis) => ({
         name: 'Test Checkin'
       }]
     },
-    events: () => {
-      return [{
-        id: 'TODO',
-        name: 'Test Event'
-      }]
+    events: async () => {
+      x = (await store.range('ev/')).toJS().map(event => ({
+        ...event,
+        // TODO implement getting volunteer sessions
+        volunteer_sessions: []
+      }))
+      return x
     }
   },
   Mutation: {
     createEvent: (_, {event: event_arg}) => {
       const id = event_arg.id
       const event = Map(event_arg)
-      redis.set(`ev/${id}`, event)
+      store.set(`ev/${id}`, event)
       return true
     },
     createCheckin: (_, {checkin: checkin_arg}) => {
@@ -89,7 +92,7 @@ const resolvers = (logger, redis) => ({
       } = checkin_arg
       const checkin = Map(checkin_arg)
 
-      redis.set(`ec/${event_id}/c/${email}/in/${timestamp}`, checkin)
+      store.set(`ec/${event_id}/c/${email}/in/${timestamp}`, checkin)
       return true
     },
     createCheckout: (_, {checkout: checkout_arg}) => {
@@ -100,7 +103,7 @@ const resolvers = (logger, redis) => ({
       } = checkout_arg
       const checkout = Map(checkout_arg)
 
-      redis.set(`ec/${event_id}/c/${email}/out/${timestamp}`, checkout)
+      store.set(`ec/${event_id}/c/${email}/out/${timestamp}`, checkout)
       return true
     }
   },
@@ -109,10 +112,10 @@ const resolvers = (logger, redis) => ({
   JSON: GraphQLJSON,
 })
 
-const GraphQL = (app, logger, redis) => {
+const GraphQL = (app, logger, store) => {
   let server = new ApolloServer({
     typeDefs,
-    resolvers: resolvers(logger, redis)
+    resolvers: resolvers(logger, store)
   })
   server.applyMiddleware({ app })
 }
