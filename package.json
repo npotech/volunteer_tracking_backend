@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/npotech/volunteer_tracking_backend#readme",
   "dependencies": {
-    "apollo-server": "^2.4.8",
+    "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.4.8",
     "commander": "^2.19.0",
     "csv": "^5.1.1",
